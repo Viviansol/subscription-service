@@ -6,6 +6,8 @@ import (
 	"github.com/alexedwards/scs/redisstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/gomodule/redigo/redis"
+	_ "github.com/jackc/pgconn"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"log"
 	"net/http"
 	"os"
@@ -14,18 +16,6 @@ import (
 )
 
 const webPort = "80"
-
-func (app *Config) serve() {
-	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%s", webPort),
-		Handler: app.routes(),
-	}
-	app.InfoLog.Println("Starting web server...")
-	err := srv.ListenAndServe()
-	if err != nil {
-		log.Panic(err)
-	}
-}
 
 func main() {
 
@@ -50,6 +40,18 @@ func main() {
 
 }
 
+func (app *Config) serve() {
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%s", webPort),
+		Handler: app.routes(),
+	}
+	app.InfoLog.Println("Starting web server...")
+	err := srv.ListenAndServe()
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
 func initDB() *sql.DB {
 
 	conn := connectToDB()
@@ -66,6 +68,7 @@ func connectToDB() *sql.DB {
 		connection, err := openDB(dsn)
 		if err != nil {
 			log.Println("postgres not ready yet...")
+			log.Println(err)
 
 		} else {
 			log.Println("connected to database")
@@ -77,7 +80,6 @@ func connectToDB() *sql.DB {
 		}
 		log.Println("Backing off for 1 second")
 		time.Sleep(1 * time.Second)
-		counts++
 		continue
 	}
 }
