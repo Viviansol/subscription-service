@@ -2,6 +2,8 @@ package main
 
 import (
 	"database/sql"
+	_ "github.com/jackc/pgconn"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"log"
 	"os"
 	"time"
@@ -9,7 +11,8 @@ import (
 
 func main() {
 
-	initDB()
+	db := initDB()
+	db.Ping()
 
 }
 
@@ -19,6 +22,7 @@ func initDB() *sql.DB {
 	if conn == nil {
 		log.Panic("Cant connect to DB")
 	}
+	return conn
 }
 
 func connectToDB() *sql.DB {
@@ -39,6 +43,7 @@ func connectToDB() *sql.DB {
 		}
 		log.Println("Backing off for 1 second")
 		time.Sleep(1 * time.Second)
+		counts++
 		continue
 	}
 }
@@ -55,4 +60,3 @@ func openDB(dsn string) (*sql.DB, error) {
 
 	return db, nil
 }
-a
