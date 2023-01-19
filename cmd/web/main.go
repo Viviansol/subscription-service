@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sub-service/data"
 	"sync"
 	"syscall"
 	"time"
@@ -37,6 +38,7 @@ func main() {
 		InfoLog:  infolog,
 		ErrorLog: errlog,
 		Wait:     &wg,
+		Models:   data.New(db),
 	}
 	go app.listenForShutDown()
 	app.serve()
