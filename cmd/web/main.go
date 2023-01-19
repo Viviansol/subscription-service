@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -19,6 +20,19 @@ func main() {
 	db.Ping()
 
 	session := initSession()
+
+	infolog := log.New(os.Stdout, "Info", log.Ldate|log.Ltime)
+	errlog := log.New(os.Stdout, "Error", log.Ldate|log.Ltime|log.Lshortfile)
+
+	wg := sync.WaitGroup{}
+
+	app := Config{
+		Session:  session,
+		DB:       db,
+		InfoLog:  infolog,
+		ErrorLog: errlog,
+		Wait:     &wg,
+	}
 
 }
 
