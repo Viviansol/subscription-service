@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/concurrency</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="concurrency@localhost [2]" uuid="d8164ce7-458c-49c8-93a9-fb3b2a44cbcb">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/concurrency</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
