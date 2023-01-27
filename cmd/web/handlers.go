@@ -154,3 +154,7 @@ func (app *Config) ChooseSubscription(w http.ResponseWriter, r *http.Request) {
 		Data: dataMap,
 	})
 }
+
+func (app *Config) SubscribeToPlan(w http.ResponseWriter, r *http.Request) {
+
+}

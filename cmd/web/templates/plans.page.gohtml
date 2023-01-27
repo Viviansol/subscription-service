@@ -9,26 +9,26 @@
                 <hr>
                 <table class="table table-compact table-striped">
                     <thead>
-                        <tr>
-                            <th>Plan</th>
-                            <th class="text-center">Price</th>
-                            <th class="text-center">Select</th>
-                        </tr>
+                    <tr>
+                        <th>Plan</th>
+                        <th class="text-center">Price</th>
+                        <th class="text-center">Select</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {{range index .Data "plans"}}
-                            <tr>
-                                <td>{{.PlanName}}</td>
-                                <td class="text-center">{{.PlanAmountFormatted}}/month</td>
-                                <td class="text-center">
-                                    {{ if and ($user.Plan) (eq $user.Plan.ID .ID)}}
-                                    <strong> Current Plan</strong>
-                                    {{ else}}
+                    {{range index .Data "plans"}}
+                        <tr>
+                            <td>{{.PlanName}}</td>
+                            <td class="text-center">{{.PlanAmountFormatted}}/month</td>
+                            <td class="text-center">
+                                {{if and ($user.Plan) (eq $user.Plan.ID .ID)}}
+                                    <strong>Current Plan</strong>
+                                {{else}}
                                     <a class="btn btn-primary btn-sm" href="#!" onclick="selectPlan({{.ID}}, '{{.PlanName}}')">Select</a>
-                                    {{.else}}
-                                </td>
-                            </tr>
-                        {{end}}
+                                {{end}}
+                            </td>
+                        </tr>
+                    {{end}}
                     </tbody>
                 </table>
             </div>
@@ -48,7 +48,7 @@
                 confirmButtonText: 'Subscribe',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    {{/* window.location.href = '/subscribe?id=' + x; */}}
+                     window.location.href = '/subscribe?id=' + x;
                 }
             })
         }
