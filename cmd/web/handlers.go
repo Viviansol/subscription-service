@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"sub-service/data"
 )
 
@@ -138,11 +139,6 @@ func (app *Config) ActiveAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Config) ChooseSubscription(w http.ResponseWriter, r *http.Request) {
-	if !app.Session.Exists(r.Context(), "userID") {
-		app.Session.Put(r.Context(), "warning", "you must login to see this page")
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		return
-	}
 	plans, err := app.Models.Plan.GetAll()
 	if err != nil {
 		app.ErrorLog.Println(err)
@@ -156,5 +152,20 @@ func (app *Config) ChooseSubscription(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Config) SubscribeToPlan(w http.ResponseWriter, r *http.Request) {
+
+	id := r.URL.Query().Get("id")
+	planID, _ := strconv.Atoi(id)
+	plan, err := app.Models.Plan.GetOne(id)
+	if err != nil {
+		app.Session.Put(r.Context(), "error", "unable to find plan")
+		http.Redirect(w, r, "/members/plans", http.StatusSeeOther)
+		return
+	}
+	user, ok := app.Session.Get(r.Context(), "user").(data.User)
+	if !ok {
+		app.Session.Put(r.Context(), "error", "log in first")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 
 }
