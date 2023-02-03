@@ -186,7 +186,7 @@ func (app *Config) SubscribeToPlan(w http.ResponseWriter, r *http.Request) {
 		}
 		app.sendEmail(msg)
 	}()
-
+	app.Wait.Add(1)
 	go func() {
 		app.Wait.Done()
 		pdf := app.generateManual(user, plan)
@@ -207,24 +207,48 @@ func (app *Config) SubscribeToPlan(w http.ResponseWriter, r *http.Request) {
 		app.ErroChan <- errors.New("error")
 	}()
 
+	err = app.Models.Plan.SubscribeUserToPlan(user, *plan)
+	if err != nil {
+		app.Session.Put(r.Context(), "error", "error subscribing to plan")
+		http.Redirect(w, r, "/members/plan", http.StatusSeeOther)
+		return
+	}
+	u, err := app.Models.User.GetOne(user.ID)
+	if err != nil {
+		app.Session.Put(r.Context(), "error", "error getting user")
+		http.Redirect(w, r, "/members/plan", http.StatusSeeOther)
+		return
+	}
+	app.Session.Put(r.Context(), "user", u)
+
+	app.Session.Put(r.Context(), "flash", "subscribed!")
+	http.Redirect(w, r, "/members/plans", http.StatusSeeOther)
+
 }
 
 func (app *Config) generateManual(u data.User, plan *data.Plan) *gofpdf.Fpdf {
 	pdf := gofpdf.New("P", "mm", "Letter", "")
-	pdf.SetMargins(10, 30, 10)
+	pdf.SetMargins(10, 13, 10)
+
 	importer := gofpdi.NewImporter()
 
 	time.Sleep(5 * time.Second)
+
 	t := importer.ImportPage(pdf, "./pdf/manual.pdf", 1, "/MediaBox")
 	pdf.AddPage()
+
 	importer.UseImportedTemplate(pdf, t, 0, 0, 215.9, 0)
+
 	pdf.SetX(75)
 	pdf.SetY(150)
+
 	pdf.SetFont("Arial", "", 12)
 	pdf.MultiCell(0, 4, fmt.Sprintf("%s %s", u.FirstName, u.LastName), "", "C", false)
 	pdf.Ln(5)
-	pdf.MultiCell(0, 4, fmt.Sprintf("%s UserGuide"), "", "C", false)
+	pdf.MultiCell(0, 4, fmt.Sprintf("%s User Guide", plan.PlanName), "", "C", false)
+
 	return pdf
+
 }
 
 func (app *Config) getInvoice(u data.User, plan *data.Plan) (string, error) {
